@@ -1,7 +1,6 @@
 package com.mollov.example.viewcontroller
 
 import android.content.Context
-import android.view.View
 import android.widget.Button
 import android.widget.Toast
 import com.mollov.example.R
@@ -14,7 +13,7 @@ class LoginViewController(context: Context) : ViewController(context) {
 
     override fun getLayoutId(): Int = R.layout.view_login
 
-    override fun onViewCreated(view: View) {
+    override fun onCreated() {
 
         findViewById<Button>(R.id.confirmButton)?.setOnClickListener {
             Toast.makeText(context, "Login!", Toast.LENGTH_SHORT).show()

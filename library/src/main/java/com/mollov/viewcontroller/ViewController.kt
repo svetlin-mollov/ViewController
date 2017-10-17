@@ -21,38 +21,44 @@ abstract class ViewController(val context: Context) : View.OnAttachStateChangeLi
         if (view == null) {
             view = LayoutInflater.from(context).inflate(getLayoutId(), parent, false)
 
-            onViewCreated(view!!)
+            onCreated()
         } else {
-            remove()?.now()
+            remove().now()
         }
 
-        val nonNullView = view!!
+        val view = getView()
+        view.addOnAttachStateChangeListener(this)
 
-        nonNullView.addOnAttachStateChangeListener(this)
-
-        return AddAction(parent, nonNullView, index)
+        return AddAction(parent, view, index)
     }
 
-    fun remove(): RemoveAction? {
-        val finalView = view
-        if (finalView == null || finalView.parent == null) {
-            return null
-        }
+    fun remove(): RemoveAction {
+        val view = getView()
 
-        return RemoveAction(finalView) { finalView.removeOnAttachStateChangeListener(this) }
+        return RemoveAction(view) {
+            view.removeOnAttachStateChangeListener(this)
+        }
     }
 
     fun getView(): View {
-        return view ?: throw  IllegalStateException("${javaClass.simpleName} not added, yet!")
+        return view ?: throw IllegalStateException("${javaClass.simpleName} not added, yet!")
     }
 
     fun isAdded(): Boolean = view?.isAttachedToWindow ?: false
 
-    abstract protected fun onViewCreated(view: View)
+    final override fun onViewAttachedToWindow(v: View) {
+        onAdded()
+    }
 
-    override fun onViewAttachedToWindow(v: View) {}
-
-    override fun onViewDetachedFromWindow(v: View) {}
+    final override fun onViewDetachedFromWindow(v: View) {
+        onRemoved()
+    }
 
     fun <T : View> findViewById(@IdRes id: Int): T? = view?.findViewById(id)
+
+    protected abstract fun onCreated()
+
+    protected open fun onAdded() {}
+
+    protected open fun onRemoved() {}
 }
