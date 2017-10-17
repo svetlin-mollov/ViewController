@@ -11,6 +11,9 @@ import android.view.animation.AnimationUtils
  */
 interface Action {
 
+    /**
+     * Executes the pending action
+     */
     fun now()
 }
 
@@ -18,6 +21,9 @@ abstract class AnimatedAction : Action {
 
     protected var animationRes: Int = 0
 
+    /**
+     * @param animationRes The resource ID of the view animation to play
+     */
     fun animate(@AnimRes animationRes: Int): Action {
         this.animationRes = animationRes
 

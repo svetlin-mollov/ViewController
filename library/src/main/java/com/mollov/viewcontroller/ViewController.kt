@@ -14,9 +14,21 @@ abstract class ViewController(val context: Context) : View.OnAttachStateChangeLi
 
     private var view: View? = null
 
+    /**
+     * @return The layout resource ID of the ViewController's view
+     */
     @LayoutRes
     abstract protected fun getLayoutId(): Int
 
+    /**
+     * Adds the ViewController's view to the [parent]'s layout hierarchy. If the view
+     * already has a parent, it will be removed from it and added in the new container
+     *
+     * @param parent The [ViewGroup] to add the ViewController's view to
+     * @param index The position at which to add the ViewController's view
+     *
+     * @see remove
+     */
     fun addIn(parent: ViewGroup, index: Int = -1): AddAction {
         if (view == null) {
             view = LayoutInflater.from(context).inflate(getLayoutId(), parent, false)
@@ -32,6 +44,14 @@ abstract class ViewController(val context: Context) : View.OnAttachStateChangeLi
         return AddAction(parent, view, index)
     }
 
+    /**
+     * Removes the ViewController's view from it's parent
+     *
+     * @throws [IllegalStateException] if the view is not added in parent
+     *
+     * @see isAdded
+     * @see addIn
+     */
     fun remove(): RemoveAction {
         val view = getView()
 
@@ -40,10 +60,22 @@ abstract class ViewController(val context: Context) : View.OnAttachStateChangeLi
         }
     }
 
+    /**
+     * @return The ViewController's root [View]
+     *
+     * @throws [IllegalStateException] if the view is not added in parent
+     *
+     * @see isAdded
+     */
     fun getView(): View {
         return view ?: throw IllegalStateException("${javaClass.simpleName} not added, yet!")
     }
 
+    /**
+     * @return true of the ViewController's view is added to parent ViewGroup, false otherwise
+     *
+     * @see addIn
+     */
     fun isAdded(): Boolean = view?.isAttachedToWindow ?: false
 
     final override fun onViewAttachedToWindow(v: View) {
@@ -56,9 +88,19 @@ abstract class ViewController(val context: Context) : View.OnAttachStateChangeLi
 
     fun <T : View> findViewById(@IdRes id: Int): T? = view?.findViewById(id)
 
+    /**
+     * Called the first time when the ViewController's view is added to a parent ViewGroup.
+     * Should be used to initialize UI state
+     */
     protected abstract fun onCreated()
 
+    /**
+     *Called every time the ViewController's view is added to a parent ViewGroup
+     */
     protected open fun onAdded() {}
 
+    /**
+     * Called every time the ViewController's view is removed from it's parent ViewGroup
+     */
     protected open fun onRemoved() {}
 }
