@@ -10,7 +10,7 @@ import android.view.ViewGroup
 /**
  * Created by Svetlin Mollov on 15.10.2017 г..
  */
-abstract class ViewController(val context: Context) : View.OnAttachStateChangeListener {
+abstract class ViewController(private val context: Context) : View.OnAttachStateChangeListener {
 
     private var view: View? = null
 
@@ -70,6 +70,14 @@ abstract class ViewController(val context: Context) : View.OnAttachStateChangeLi
     fun getView(): View {
         return view ?: throw IllegalStateException("${javaClass.simpleName} not added, yet!")
     }
+
+    /**
+     * Returns the context the view is running in, through which it can
+     * access the current theme, resources, etc.
+     *
+     * @return The view's Context.
+     */
+    fun getContext(): Context = context
 
     /**
      * @return true of the ViewController's view is added to parent ViewGroup, false otherwise

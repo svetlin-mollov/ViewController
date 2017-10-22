@@ -16,7 +16,7 @@ class LoginViewController(context: Context) : ViewController(context) {
     override fun onCreated() {
 
         findViewById<Button>(R.id.confirmButton)?.setOnClickListener {
-            Toast.makeText(context, "Login!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(getContext(), "Login!", Toast.LENGTH_SHORT).show()
         }
     }
 }
