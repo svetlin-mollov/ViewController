@@ -53,7 +53,7 @@ ext {
 
 tasks.withType(Javadoc) {
     excludes = ['**/*.kt'] // Exclude all kotlin files from javadoc file.
-}øø
+}
 
 apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/installv1.gradle'
 apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/bintrayv1.gradle'
