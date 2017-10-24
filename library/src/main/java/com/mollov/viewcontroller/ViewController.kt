@@ -94,7 +94,7 @@ abstract class ViewController(private val context: Context) : View.OnAttachState
         onRemoved()
     }
 
-    fun <T : View> findViewById(@IdRes id: Int): T? = view?.findViewById(id)
+    protected fun <T : View> findViewById(@IdRes id: Int): T? = view?.findViewById(id)
 
     /**
      * Called the first time when the ViewController's view is added to a parent ViewGroup.
