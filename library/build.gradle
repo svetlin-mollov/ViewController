@@ -2,7 +2,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
 ext {
-    bintrayRepo = 'ViewController'
+    bintrayRepo = 'maven'
     bintrayName = 'view-controller'
 
     publishedGroupId = 'com.mollov'
