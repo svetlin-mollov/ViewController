@@ -5,16 +5,15 @@ ext {
     bintrayRepo = 'maven'
     bintrayName = 'view-controller'
 
-    publishedGroupId = 'com.mollov'
+    publishGroupId = 'com.mollov'
     libraryName = 'ViewController'
     artifact = 'view-controller'
 
+    libraryVersion = '0.5.1'
     libraryDescription = 'A lightweight alternative to Android\'s Fragments, based on pure Views'
 
     siteUrl = 'https://github.com/svetlin-mollov/ViewController'
-    gitUrl = 'https://github.com/svetlin-mollov/ViewController.git'
-
-    libraryVersion = '0.5.1'
+    gitRepoUrl = 'https://github.com/svetlin-mollov/ViewController.git'
 
     developerId = 'svetlin-mollov'
     developerName = 'Svetlin Mollov'
@@ -51,9 +50,5 @@ dependencies {
     implementation 'com.android.support:support-annotations:26.1.0'
 }
 
-tasks.withType(Javadoc) {
-    excludes = ['**/*.kt'] // Exclude all kotlin files from javadoc file.
-}
-
-apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/installv1.gradle'
-apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/bintrayv1.gradle'
+apply from: "${rootDir}/gradleScripts/install.gradle"
+apply from: "${rootDir}/gradleScripts/bintray.gradle"
