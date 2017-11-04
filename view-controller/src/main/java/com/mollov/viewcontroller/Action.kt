@@ -1,6 +1,10 @@
 package com.mollov.viewcontroller
 
+import android.animation.Animator
+import android.animation.AnimatorInflater
+import android.animation.AnimatorListenerAdapter
 import android.support.annotation.AnimRes
+import android.support.annotation.AnimatorRes
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.Animation
@@ -17,58 +21,92 @@ interface Action {
     fun now()
 }
 
-abstract class AnimatedAction : Action {
+abstract class AnimatedAction(private val view: View) : Action {
 
-    protected var animationRes: Int = 0
+    private var animationRes: Int = 0
+    private var animatorRes: Int = 0
 
     /**
      * @param animationRes The resource ID of the view animation to play
      */
-    fun animate(@AnimRes animationRes: Int): Action {
+    fun withAnimation(@AnimRes animationRes: Int): Action {
         this.animationRes = animationRes
 
         return this
     }
-}
 
-class AddAction(private val parent: ViewGroup, private val view: View, private val index: Int) : AnimatedAction() {
+    fun withAnimator(@AnimatorRes animatorRes: Int): Action {
+        this.animatorRes = animatorRes
 
-    override fun now() {
-        parent.addView(view, index)
+        return this
+    }
 
-        if (animationRes != 0) {
-            val enterAnim = AnimationUtils.loadAnimation(view.context, animationRes)
-            view.startAnimation(enterAnim)
+    internal fun playAnimation(finishCallback: (() -> Unit)? = null) {
+        when {
+            animationRes != 0 -> {
+                val animation = AnimationUtils.loadAnimation(view.context, animationRes)
+                animation.setAnimationListener(object : Animation.AnimationListener {
+                    override fun onAnimationStart(animation: Animation?) {}
+
+                    override fun onAnimationRepeat(animation: Animation?) {}
+
+                    override fun onAnimationEnd(animation: Animation?) {
+                        finishCallback?.invoke()
+                    }
+                })
+                view.startAnimation(animation)
+            }
+            animatorRes != 0 -> {
+                val animator = AnimatorInflater.loadAnimator(view.context, animatorRes)
+                animator.addListener(object : AnimatorListenerAdapter() {
+
+                    override fun onAnimationEnd(animation: Animator?) {
+                        super.onAnimationEnd(animation)
+
+                        finishCallback?.invoke()
+                    }
+                })
+                animator.setTarget(view)
+                animator.start()
+            }
+            else -> finishCallback?.invoke()
         }
     }
 }
 
-class RemoveAction(private val view: View, private val onExecute: (() -> Unit)? = null) : AnimatedAction() {
+class AttachAction(private val parent: ViewGroup, private val view: View, private val index: Int) : AnimatedAction(view) {
+
+    private var isExecuted: Boolean = false
 
     override fun now() {
+        // Handle multiple calls of now()
+        if (isExecuted) {
+            throw IllegalStateException("Calling AttachAction.now() more than once!")
+        }
+        isExecuted = true
 
-        fun executeAction() {
+        parent.addView(view, index)
+
+        playAnimation()
+    }
+}
+
+class DetachAction(private val view: View, private val onExecute: (() -> Unit)? = null) : AnimatedAction(view) {
+
+    private var isExecuted: Boolean = false
+
+    override fun now() {
+        // Handle multiple calls of now()
+        if (isExecuted) {
+            throw IllegalStateException("Calling DetachAction.now() more than once!")
+        }
+        isExecuted = true
+
+        playAnimation({
             var parent = view.parent as ViewGroup
             parent.removeView(view)
 
             onExecute?.invoke()
-        }
-
-        if (animationRes != 0) {
-            val enterAnim = AnimationUtils.loadAnimation(view.context, animationRes)
-            enterAnim.setAnimationListener(object : Animation.AnimationListener {
-
-                override fun onAnimationStart(animation: Animation?) {}
-
-                override fun onAnimationRepeat(animation: Animation?) {}
-
-                override fun onAnimationEnd(animation: Animation?) {
-                    executeAction()
-                }
-            })
-            view.startAnimation(enterAnim)
-        } else {
-            executeAction()
-        }
+        })
     }
 }

@@ -17,8 +17,8 @@ class MainActivity : AppCompatActivity() {
 
         switchLayout.setOnClickListener { _ ->
             loginViewController
-                    .addIn(findViewById(if (count % 2 == 0) R.id.container else R.id.container2))
-                    .animate(R.anim.abc_fade_in)
+                    .attachTo(findViewById(if (count % 2 == 0) R.id.container else R.id.container2))
+                    .withAnimator(R.animator.fade_in)
                     .now()
 
             count++

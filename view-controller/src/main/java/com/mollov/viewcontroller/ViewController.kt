@@ -10,65 +10,74 @@ import android.view.ViewGroup
 /**
  * Created by Svetlin Mollov on 15.10.2017 г..
  */
-abstract class ViewController(private val context: Context) : View.OnAttachStateChangeListener {
+abstract class ViewController(private val context: Context) {
 
     private var view: View? = null
+
+    private val attachDetachListener = AttachDetachListener()
 
     /**
      * @return The layout resource ID of the ViewController's view
      */
     @LayoutRes
-    abstract protected fun getLayoutId(): Int
+    abstract protected fun getLayoutRes(): Int
 
     /**
-     * Adds the ViewController's view to the [parent]'s layout hierarchy. If the view
-     * already has a parent, it will be removed from it and added in the new container
+     * Attaches the ViewController's view to the [parent]'s layout hierarchy. If the view
+     * already has a parent, it will be removed from it and attached to the new container
      *
-     * @param parent The [ViewGroup] to add the ViewController's view to
+     * @param parent The [ViewGroup] to attach the ViewController's view to
      * @param index The position at which to add the ViewController's view
      *
-     * @see remove
+     * @see detach
      */
-    fun addIn(parent: ViewGroup, index: Int = -1): AddAction {
+    fun attachTo(parent: ViewGroup, index: Int = -1): AttachAction {
         if (view == null) {
-            view = LayoutInflater.from(context).inflate(getLayoutId(), parent, false)
+            view = LayoutInflater.from(context).inflate(getLayoutRes(), parent, false)
 
-            onCreated()
+            onViewCreated()
         } else {
-            remove().now()
+            detach().now()
         }
 
         val view = getView()
-        view.addOnAttachStateChangeListener(this)
+        view.addOnAttachStateChangeListener(attachDetachListener)
 
-        return AddAction(parent, view, index)
+        return AttachAction(parent, view, index)
     }
 
     /**
-     * Removes the ViewController's view from it's parent
+     * Detaches the ViewController's view from it's parent
      *
-     * @throws [IllegalStateException] if the view is not added in parent
+     * @throws [IllegalStateException] if the view is not attached
      *
-     * @see isAdded
-     * @see addIn
+     * @see isAttached
+     * @see attachTo
      */
-    fun remove(): RemoveAction {
+    fun detach(): DetachAction {
         val view = getView()
 
-        return RemoveAction(view) {
-            view.removeOnAttachStateChangeListener(this)
+        return DetachAction(view) {
+            view.removeOnAttachStateChangeListener(attachDetachListener)
         }
     }
+
+    /**
+     * @return true of the ViewController's view is attached to parent ViewGroup, false otherwise
+     *
+     * @see attachTo
+     */
+    fun isAttached(): Boolean = view?.isAttachedToWindow ?: false
 
     /**
      * @return The ViewController's root [View]
      *
-     * @throws [IllegalStateException] if the view is not added in parent
+     * @throws [IllegalStateException] if the view is not created, yet
      *
-     * @see isAdded
+     * @see isAttached
      */
     fun getView(): View {
-        return view ?: throw IllegalStateException("${javaClass.simpleName} not added, yet!")
+        return view ?: throw IllegalStateException("${javaClass.simpleName} not created, yet!")
     }
 
     /**
@@ -79,36 +88,31 @@ abstract class ViewController(private val context: Context) : View.OnAttachState
      */
     fun getContext(): Context = context
 
-    /**
-     * @return true of the ViewController's view is added to parent ViewGroup, false otherwise
-     *
-     * @see addIn
-     */
-    fun isAdded(): Boolean = view?.isAttachedToWindow ?: false
-
-    final override fun onViewAttachedToWindow(v: View) {
-        onAdded()
-    }
-
-    final override fun onViewDetachedFromWindow(v: View) {
-        onRemoved()
-    }
-
     protected fun <T : View> findViewById(@IdRes id: Int): T? = view?.findViewById(id)
 
     /**
-     * Called the first time when the ViewController's view is added to a parent ViewGroup.
+     * Called the first time the ViewController's view is attached to a parent ViewGroup.
      * Should be used to initialize UI state
      */
-    protected abstract fun onCreated()
+    protected abstract fun onViewCreated()
 
     /**
-     *Called every time the ViewController's view is added to a parent ViewGroup
+     *Called every time the ViewController's view is attached to a parent ViewGroup
      */
-    protected open fun onAdded() {}
+    protected open fun onViewAttached() {}
 
     /**
-     * Called every time the ViewController's view is removed from it's parent ViewGroup
+     * Called every time the ViewController's view is detached from it's parent ViewGroup
      */
-    protected open fun onRemoved() {}
+    protected open fun onViewDetached() {}
+
+    private inner class AttachDetachListener : View.OnAttachStateChangeListener {
+        override fun onViewAttachedToWindow(v: View?) {
+            onViewAttached()
+        }
+
+        override fun onViewDetachedFromWindow(v: View?) {
+            onViewDetached()
+        }
+    }
 }

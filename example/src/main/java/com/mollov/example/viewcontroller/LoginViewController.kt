@@ -11,9 +11,9 @@ import com.mollov.viewcontroller.ViewController
  */
 class LoginViewController(context: Context) : ViewController(context) {
 
-    override fun getLayoutId(): Int = R.layout.view_login
+    override fun getLayoutRes(): Int = R.layout.view_login
 
-    override fun onCreated() {
+    override fun onViewCreated() {
 
         findViewById<Button>(R.id.confirmButton)?.setOnClickListener {
             Toast.makeText(getContext(), "Login!", Toast.LENGTH_SHORT).show()
