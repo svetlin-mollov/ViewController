@@ -9,7 +9,7 @@ ext {
     libraryName = 'ViewController'
     artifact = 'view-controller'
 
-    libraryVersion = '0.5.1'
+    libraryVersion = '0.5.2'
     libraryDescription = 'A lightweight alternative to Android\'s Fragments, based on pure Views'
 
     siteUrl = 'https://github.com/svetlin-mollov/ViewController'
@@ -33,7 +33,7 @@ android {
         minSdkVersion 21
         targetSdkVersion 26
         versionCode 1
-        versionName "0.5.1"
+        versionName libraryVersion
     }
 
     buildTypes {
