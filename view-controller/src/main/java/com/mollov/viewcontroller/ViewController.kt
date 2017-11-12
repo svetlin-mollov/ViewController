@@ -31,6 +31,7 @@ abstract class ViewController(private val context: Context) {
      *
      * @see detach
      */
+    @JvmOverloads
     fun attachTo(parent: ViewGroup, index: Int = -1): AttachAction {
         if (view == null) {
             view = LayoutInflater.from(context).inflate(getLayoutRes(), parent, false)
@@ -86,7 +87,7 @@ abstract class ViewController(private val context: Context) {
      *
      * @return The view's Context.
      */
-    fun getContext(): Context = context
+    protected fun getContext(): Context = context
 
     protected fun <T : View> findViewById(@IdRes id: Int): T? = view?.findViewById(id)
 
