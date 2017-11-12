@@ -37,14 +37,13 @@ abstract class ViewController(private val context: Context) {
             view = LayoutInflater.from(context).inflate(getLayoutRes(), parent, false)
 
             onViewCreated()
-        } else {
+        } else if (isAttached()) {
             detach().now()
         }
 
-        val view = getView()
-        view.addOnAttachStateChangeListener(attachDetachListener)
-
-        return AttachAction(parent, view, index)
+        return AttachAction(parent, getView(), index) {
+            getView().addOnAttachStateChangeListener(attachDetachListener)
+        }
     }
 
     /**
@@ -55,12 +54,9 @@ abstract class ViewController(private val context: Context) {
      * @see isAttached
      * @see attachTo
      */
-    fun detach(): DetachAction {
-        val view = getView()
-
-        return DetachAction(view) {
-            view.removeOnAttachStateChangeListener(attachDetachListener)
-        }
+    fun detach(): DetachAction = DetachAction(getView()) {
+        // Clear attach/detach listener
+        getView().removeOnAttachStateChangeListener(attachDetachListener)
     }
 
     /**
@@ -109,7 +105,7 @@ abstract class ViewController(private val context: Context) {
 
     private inner class AttachDetachListener : View.OnAttachStateChangeListener {
 
-        var isAttached: Boolean = false
+        var isAttached = false
 
         override fun onViewAttachedToWindow(v: View?) {
             isAttached = true

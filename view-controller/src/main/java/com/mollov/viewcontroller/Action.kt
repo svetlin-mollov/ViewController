@@ -77,7 +77,11 @@ abstract class AnimatedAction(private val view: View) : Action {
     }
 }
 
-class AttachAction(private val parent: ViewGroup, private val view: View, private val index: Int) : AnimatedAction(view) {
+class AttachAction(
+        private val parent: ViewGroup,
+        private val view: View,
+        private val index: Int,
+        private val onPreExecute: () -> Unit) : AnimatedAction(view) {
 
     private var isExecuted: Boolean = false
 
@@ -88,13 +92,17 @@ class AttachAction(private val parent: ViewGroup, private val view: View, privat
         }
         isExecuted = true
 
+        onPreExecute.invoke()
+
         parent.addView(view, index)
 
         playAnimation()
     }
 }
 
-class DetachAction(private val view: View, private val onExecute: (() -> Unit)? = null) : AnimatedAction(view) {
+class DetachAction(
+        private val view: View,
+        private val onPostExecute: () -> Unit) : AnimatedAction(view) {
 
     private var isExecuted: Boolean = false
 
@@ -106,10 +114,10 @@ class DetachAction(private val view: View, private val onExecute: (() -> Unit)? 
         isExecuted = true
 
         playAnimation({
-            var parent = view.parent as ViewGroup
+            val parent = view.parent as ViewGroup
             parent.removeView(view)
 
-            onExecute?.invoke()
+            onPostExecute?.invoke()
         })
     }
 }
