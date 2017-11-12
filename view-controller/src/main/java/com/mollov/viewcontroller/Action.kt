@@ -35,6 +35,9 @@ abstract class AnimatedAction(private val view: View) : Action {
         return this
     }
 
+    /**
+     * @param animatorRes The resource ID of the animation to play
+     */
     fun withAnimator(@AnimatorRes animatorRes: Int): Action {
         this.animatorRes = animatorRes
 

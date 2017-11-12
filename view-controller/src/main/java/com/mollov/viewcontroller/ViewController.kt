@@ -68,7 +68,7 @@ abstract class ViewController(private val context: Context) {
      *
      * @see attachTo
      */
-    fun isAttached(): Boolean = view?.isAttachedToWindow ?: false
+    fun isAttached(): Boolean = attachDetachListener.isAttached
 
     /**
      * @return The ViewController's root [View]
@@ -108,11 +108,18 @@ abstract class ViewController(private val context: Context) {
     protected open fun onViewDetached() {}
 
     private inner class AttachDetachListener : View.OnAttachStateChangeListener {
+
+        var isAttached: Boolean = false
+
         override fun onViewAttachedToWindow(v: View?) {
+            isAttached = true
+
             onViewAttached()
         }
 
         override fun onViewDetachedFromWindow(v: View?) {
+            isAttached = false
+
             onViewDetached()
         }
     }
