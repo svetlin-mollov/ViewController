@@ -10,7 +10,7 @@ ext {
     artifact = 'view-controller'
 
     libraryVersion = '0.5.4'
-    libraryDescription = 'A lightweight alternative to Android\'s Fragments, based on pure Views'
+    libraryDescription = 'A lightweight controller for Android Views'
 
     siteUrl = 'https://github.com/svetlin-mollov/ViewController'
     gitRepoUrl = 'https://github.com/svetlin-mollov/ViewController.git'
